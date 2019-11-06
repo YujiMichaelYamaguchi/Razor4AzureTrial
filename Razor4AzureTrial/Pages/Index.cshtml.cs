@@ -9,9 +9,11 @@ namespace Razor4AzureTrial.Pages
 {
     public class IndexModel : PageModel
     {
-        public void OnGet()
+        public async Task<IActionResult> OnGet()
         {
+            await Task.Delay(1);
 
+            return RedirectToPage("/Face");
         }
     }
 }

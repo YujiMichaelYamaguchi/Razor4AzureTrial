@@ -1,0 +1,159 @@
+﻿@page
+@model Razor4AzureTrial.Pages.FaceModel
+@{
+    ViewData["Title"] = "Face";
+
+}
+
+<h2>Face</h2>
+
+
+<br />
+<div id="imageSelection">
+        <table border="0" style="width:100%">
+            <tr align="center">
+                <td>
+                    <p>
+                        <script src="~/js/jquery-3.4.1.min.js"></script>
+                    </p>
+                    <p><input type="file" id="myImage" accept="image/*"></p>
+                    <p>ファイルを選択すると、下にプレビューを表示します。</p>
+                </td>
+            </tr>
+            <tr align="center">
+                <td>
+                    <div style="display:inline-block;min-width:200px; min-height:200px; border:5px dashed #eee; padding:10px;">
+                        <img id="preview" src="@Model.selectedImage">
+                    </div>
+                </td>
+            </tr>
+            <tr align="center">
+                <td>
+                    <form id="imageSelection" name="imageSelection" method="post" enctype="multipart/form-data">
+                        <br />
+                        <input id="base64txt" type="hidden" name="base64txt" asp-for="base64txt" size="20" />
+                        <p><input type="submit" name="submit" value="送信" /></p>
+                    </form>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+    <div id="faceTable">
+        @{ if (Model.faceIdList != null && Model.faceIdList.Count > 0)
+            {
+                foreach (var face in Model.faceIdList)
+                {
+        <table border="1" style="width:100%" cellpadding="5">
+            <tr>
+                <td width="25%" align="center" colspan="2"><img id="faceRectangle" src="@face.faceRectangleBase64String" /></td>
+                <td width="75%" align="center" colspan="6">faceid : @face.faceId</td>
+            </tr>
+            <tr>
+                <td width="25%" align="center" colspan="2">top</td>
+                <td width="25%" align="center" colspan="2">left</td>
+                <td width="25%" align="center" colspan="2">width</td>
+                <td width="25%" align="center" colspan="2">height</td>
+            </tr>
+            <tr>
+                <td width="25%" align="right" colspan="2">@face.faceRectangle.top</td>
+                <td width="25%" align="right" colspan="2">@face.faceRectangle.left</td>
+                <td width="25%" align="right" colspan="2">@face.faceRectangle.width</td>
+                <td width="25%" align="right" colspan="2">@face.faceRectangle.height</td>
+            </tr>
+            <tr>
+                <td width="12.5%" align="center" @if (face.mainEmotion == "anger") { @: bgcolor="red"
+                    }>
+                    anger
+                </td>
+                <td width="12.5%" align="center" @if (face.mainEmotion == "contempt") { @: bgcolor="green"
+                    }>
+                    contempt
+                </td>
+                <td width="12.5%" align="center" @if (face.mainEmotion == "disgust") { @: bgcolor="gray"
+                    }>
+                    disgust
+                </td>
+                <td width="12.5%" align="center" @if (face.mainEmotion == "fear") { @: bgcolor="turquoise"
+                    }>
+                    fear
+                </td>
+                <td width="12.5%" align="center" @if (face.mainEmotion == "happiness") { @: bgcolor="pink"
+                    }>
+                    happiness
+                </td>
+                <td width="12.5%" align="center" @if (face.mainEmotion == "neutral") { @: bgcolor="antiquewhite"
+                    }>
+                    neutral
+                </td>
+                <td width="12.5%" align="center" @if (face.mainEmotion == "sadness") { @: bgcolor="Aquamarine"
+                    }>
+                    sadness
+                </td>
+                <td width="12.5%" align="center" @if (face.mainEmotion == "surprise") { @: bgcolor="darkkhaki"
+                    }>
+                    surprise
+                </td>
+            </tr>
+            <tr>
+                <td width="12.5%" align="right">@face.faceAttributes.emotion.anger</td>
+                <td width="12.5%" align="right">@face.faceAttributes.emotion.contempt</td>
+                <td width="12.5%" align="right">@face.faceAttributes.emotion.disgust</td>
+                <td width="12.5%" align="right">@face.faceAttributes.emotion.fear</td>
+                <td width="12.5%" align="right">@face.faceAttributes.emotion.happiness</td>
+                <td width="12.5%" align="right">@face.faceAttributes.emotion.neutral</td>
+                <td width="12.5%" align="right">@face.faceAttributes.emotion.sadness</td>
+                <td width="12.5%" align="right">@face.faceAttributes.emotion.surprise</td>
+            </tr>
+            @if (face.faceAttributes.accessories != null && face.faceAttributes.accessories.Count() > 0)
+            {
+                <tr>
+                    <td align="center" colspan="8">Accessories</td>
+                </tr>
+                    @foreach (var ac in face.faceAttributes.accessories)
+                    {
+                        <tr>
+                        <td align="center" colspan="8">type:@ac.type confidence:@ac.confidence</td>
+                        </tr>
+                    }
+            }
+            @if (face.faceAttributes.hair.hairColor != null && face.faceAttributes.hair.hairColor.Count() > 0)
+            {
+                <tr>
+                    <td align="center" colspan="8">Hair</td>
+                </tr>
+                    @foreach (var hr in face.faceAttributes.hair.hairColor)
+                    {
+                        <tr>
+                        <td align="center" colspan="8">color:@hr.color confidence:@hr.confidence</td>
+                        </tr>
+                    }
+                
+            }
+        </table>
+        <br />
+                }
+            }
+        }
+  </div>
+<script type="text/javascript">
+    $('#myImage').on('click', function (e) {
+
+        var table = document.getElementById('faceTable');
+        table.innerHTML = '';
+    });
+
+    $('#myImage').on('change', function (e) {
+
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $("#preview").attr('src', e.target.result);
+
+                        var dataURL = e.target.result;
+                        document.getElementById('base64txt').setAttribute('value', dataURL);
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                });
+
+</script>
+
